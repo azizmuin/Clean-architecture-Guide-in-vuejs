@@ -13,15 +13,16 @@ export class AuthRepository extends BaseRepository implements IAuthRepository  {
         super({axios});
     };
 
-    async login(payload: loginRequest): Promise<Either<DataError, tokenData>> {
-
-        try {
-            const { data } = await this.axios.post('/api/v1/auth/sign-in', payload);
-            const result = LoginResponseModel.fromJson(data);
-            return Either.right(result.toDomain().data);
-        } catch (error) {
-            return Either.left(this.handleErrors(error));
-        }
+    async login(payload: loginRequest): Promise<tokenData> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const { data } = await this.axios.post('/api/v1/auth/sign-in', payload);
+                const result = LoginResponseModel.fromJson(data);
+                resolve(result.toDomain().data);
+            } catch (error) {
+                reject(this.handleErrors(error))
+            }
+        })
     }
 
     async register(payload: loginRequest): Promise<Either<DataError, registerData>> {

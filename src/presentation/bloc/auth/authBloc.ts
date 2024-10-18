@@ -1,6 +1,6 @@
 import type { LoginUseCase } from "@/domain/use-cases/auth/LoginUseCase";
 import type { AuthenticationStore } from "./authState";
-import type { ResetPasswordRequest, User, loginRequest } from "@/domain/entities/auth";
+import type { ResetPasswordRequest, User, loginRequest, tokenData } from "@/domain/entities/auth";
 import type { RegisterUseCase } from "@/domain/use-cases/auth/RegisterUseCase";
 import { Base64 } from 'js-base64';
 import { ploc } from "@/core/ploc";
@@ -47,26 +47,26 @@ export class AuthBloc extends ploc<AuthenticationStore> {
         this.resetPasswordUseCase = resetPasswordUseCase;
     }
 
-    login = async (payload: loginRequest): Promise<void> => {
+    login = (payload: loginRequest): void => {
         this.store.error = "";
         this.store.loadingRequest = true;
         this.store.token = null;
-        const failureOrSuccess = await this.loginuseCase.exceute(payload);
-        this.store.loadingRequest = false;
 
-        failureOrSuccess.fold(
-            error => {
-                this.store.error = this.handleErrors(error);
-            },
-            (response) => {
+        this.loginuseCase.exceute(payload)
+            .then((response) => {
                 localStorage.setItem('token', response.accessToken);
                 this.store.initAuth();
                 this.store.token = response.accessToken;
                 const userId = this.decodeToken(response.accessToken);
                 const ploc = dependencyLocator.provideAuthPloc();
                 ploc.fetchUserPermissions(userId);
-            }
-        )
+            })
+            .catch((error) => {
+                this.store.error = this.handleErrors(error);
+            })
+            .finally(() => {
+                this.store.loadingRequest = false;
+            })
     }
 
     register = async (payload: loginRequest): Promise<void> => {

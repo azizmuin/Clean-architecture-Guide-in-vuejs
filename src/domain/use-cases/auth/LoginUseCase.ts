@@ -10,7 +10,19 @@ export class LoginUseCase {
         this.authRepository = authRepository;
     }
 
-    exceute(payload: loginRequest): Promise<Either<DataError,tokenData>> {
-        return this.authRepository.login(payload);
+    async exceute(payload: loginRequest): Promise<tokenData> {
+        try {
+            let token = await this.authRepository.login(payload);
+            return Promise.resolve(token)
+        } catch (error) {
+            return Promise.reject(error)
+        }
+        // return new Promise(async (resolve, reject) => {
+        //     try {
+        //         resolve(token)
+        //     } catch (error) {
+        //         reject(error)
+        //     }
+        // })
     }
 }

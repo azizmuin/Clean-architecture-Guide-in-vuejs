@@ -14,18 +14,51 @@ export interface AuthenticationError {
     error: Error;
 }
 
-export interface ErrorData {
+// export interface ErrorData {
+//     message: string;
+//     source:  string;
+//     value:   string;
+// }
+
+// export interface ErrorFold {
+//     kind: "ErrorFold",
+//     error: ErrorData[],
+// }
+
+export class UnexpectedError implements Error {
+    name: string;
     message: string;
-    source:  string;
-    value:   string;
+
+    constructor(message: string) {
+        this.name =  "UnexpectedError";
+        this.message = message
+    }    
 }
 
-export interface ErrorFold {
-    kind: "ErrorFold",
-    error: ErrorData[],
+export class ServerError implements Error {
+    name: string;
+    message: string;
+    errorCode: number;
+
+    constructor(message: string, errorCode: number) {
+        this.name =  "ServerError";
+        this.message = message
+        this.errorCode = errorCode
+    }    
 }
 
+export class ErrorData<T> implements Error {
+    name: string;
+    message: string;
+    data: T;
 
-export type DataError = UnexpectedError | ServerError | AuthenticationError | ErrorFold;
+    constructor(message: string, errorCode: number, data: T) {
+        this.name =  "ServerError";
+        this.message = message
+        this.data = data
+    }    
+}
+
+// export type DataError = UnexpectedError | ServerError | AuthenticationError | ErrorFold;
   
   
