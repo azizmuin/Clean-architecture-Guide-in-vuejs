@@ -1,5 +1,5 @@
 import type { Router } from "vue-router";
-import type { DataError, ErrorFold } from "./domain/DataError";
+import { AuthenticationError, ErrorFold, ServerError, UnexpectedError } from "./domain/DataError";
 
 export class ploc<T> {
   public store: T;
@@ -10,22 +10,20 @@ export class ploc<T> {
     this.router = router;
   }
 
-  handleErrors(error: DataError): string {
+  handleErrors(error: Error): string {
     let err = '';
-    switch (error.kind) {
-      case "UnexpectedError":
-        const unexpectedError = error as Extract<DataError, { kind: "UnexpectedError" }>;
-        err = unexpectedError.error.message;
+    switch (error.constructor) {
+      case UnexpectedError:
+        err = error.message;
         break;
-      case "ServerError":
-        const serverError = error as Extract<DataError, { kind: "ServerError" }>;
-        err = serverError.error.message;
+      case ServerError:
+        err = error.message;
         break;
-      case "ErrorFold":
-        const errorDataArray = error as ErrorFold;
-        err = errorDataArray.error[0].message;
+      case ErrorFold:
+        const errorData = (error as ErrorFold).errorData;
+        err = errorData[0].message;
         break;
-      case "AuthenticationError":
+      case AuthenticationError:
         this.router.push({name: 'AuthLogin'});
         break;
       default:

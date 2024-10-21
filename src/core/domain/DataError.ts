@@ -1,64 +1,40 @@
-export interface UnexpectedError {
-    kind: "UnexpectedError";
-    error: Error;
-}
-
-export interface ServerError {
-    kind: "ServerError";
-    error: Error;
-    errorCode: number;
-}
-
-export interface AuthenticationError {
-    kind: "AuthenticationError";
-    error: Error;
-}
-
-// export interface ErrorData {
-//     message: string;
-//     source:  string;
-//     value:   string;
-// }
-
-// export interface ErrorFold {
-//     kind: "ErrorFold",
-//     error: ErrorData[],
-// }
-
-export class UnexpectedError implements Error {
-    name: string;
-    message: string;
-
+export class UnexpectedError extends Error {
     constructor(message: string) {
+        super(message);
         this.name =  "UnexpectedError";
-        this.message = message
     }    
 }
 
-export class ServerError implements Error {
-    name: string;
-    message: string;
-    errorCode: number;
+export class ServerError extends Error {
+    public readonly errorCode: number;
 
     constructor(message: string, errorCode: number) {
+        super(message);
         this.name =  "ServerError";
-        this.message = message
-        this.errorCode = errorCode
+        this.errorCode = errorCode;
     }    
 }
 
-export class ErrorData<T> implements Error {
-    name: string;
+export class AuthenticationError extends Error {
+    constructor(message: string) {
+        super(message)
+        this.name =  "AuthenticationError";
+    }    
+}
+interface ErrorData {
     message: string;
-    data: T;
-
-    constructor(message: string, errorCode: number, data: T) {
-        this.name =  "ServerError";
-        this.message = message
-        this.data = data
-    }    
+    source:  string;
+    value:   string;
 }
 
-// export type DataError = UnexpectedError | ServerError | AuthenticationError | ErrorFold;
+export class ErrorFold extends Error {
+    public readonly errorData: ErrorData[];
+
+    constructor(message: string, errorData: ErrorData[]) {
+        super(message);
+        this.name =  "ErrorFold";
+        this.errorData = errorData;
+    }    
+}
   
   
